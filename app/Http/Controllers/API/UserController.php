@@ -297,6 +297,7 @@ class UserController extends Controller
 
             // Update password user
             $user->password = Hash::make($validated['new_password']);
+            $user->password_reset_at = null;
             $user->save();
 
             return ResponseFormatter::success($user);
