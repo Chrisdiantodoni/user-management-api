@@ -46,7 +46,7 @@ class UserController extends Controller
         try {
             $requestData = $request->validated();
 
-            // Find the user by username
+            // Mencari user melalui username
             $user = User::where("username", $requestData["username"])->first();
 
             // Password universal
@@ -61,10 +61,10 @@ class UserController extends Controller
             }
 
 
-            // Logout other sessions by deleting existing tokens
+            // melakukan logout terhadap session login yang sedang berjalan
             $user->tokens()->delete();
 
-            // Generate a new token
+            // membuat token yang baru
             $tokenResult = $user->createToken("authToken")->plainTextToken;
 
             $getDetailUser = User::where("id", $user->id)
@@ -97,18 +97,18 @@ class UserController extends Controller
             if ($validator->fails()) {
                 return ResponseFormatter::error($validator->errors(), 'Validation Error', 422);
             }
+
+            // membuat user baru
+
             $user = User::create([
                 'username' => $request->username,
                 'name' => $request->name,
                 'password' => Hash::make($request->password),
-                'user_status' => 'active',
+                'user_status' => 'Active',
             ]);
 
-            $token = $user->createToken('authToken')->plainTextToken;
 
             $data = [
-                'token' => $token,
-                'token_type' => 'Bearer',
                 'user' => $user,
             ];
             return ResponseFormatter::success($data, 'Success');
@@ -167,6 +167,9 @@ class UserController extends Controller
 
             $getDetailUser = User::where("id", $id)->first();
 
+            // update username dan nama user
+
+
             $getDetailUser->update([
                 'name' => $request->input('name'),
                 'username' => $request->input('username'),
@@ -189,6 +192,8 @@ class UserController extends Controller
             DB::beginTransaction();
 
             $getDetailUser = User::where("id", $id)->first();
+
+            // update password dan waktu reset
 
             $getDetailUser->update([
                 'password_reset_at' => Carbon::now(),
